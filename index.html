@@ -1,226 +1,137 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Controle de Suprimentos - JF Aviation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle de Materiais - JF Aviation</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
     body {
-      margin: 0;
-      background-color: #f4f4f4;
-      padding: 2rem;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
     }
-    h1 {
-      text-align: center;
-      color: #003366;
-    }
+
     form {
-      background-color: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 800px;
-      margin: 0 auto;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 30px;
     }
-    label {
+
+    input, button {
       display: block;
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      margin-top: 10px;
+      padding: 8px;
     }
-    button {
-      margin-top: 1rem;
-      background-color: #003366;
-      color: white;
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-right: 0.5rem;
+
+    #itensSalvos {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
     }
-    button:hover {
-      background-color: #005599;
-    }
-    .item-salvo {
-      background-color: #dff0d8;
-      border: 1px solid #d6e9c6;
-      padding: 1rem;
-      border-radius: 5px;
-      margin-top: 1rem;
-      position: relative;
-    }
-    .acoes {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-    }
-    .acoes button {
-      background-color: #d9534f;
-    }
-    .acoes button:hover {
-      background-color: #c9302c;
+
+    .item {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
     }
   </style>
-
-  
 </head>
 <body>
-  <h1>Controle de Suprimentos - JF Aviation</h1>
+
+  <h2>Cadastro de Itens</h2>
   <form id="formItem">
-    <label for="awp">AWB</label>
-    <input type="text" id="awp" required />
-
-    <label for="prefixo">Prefixo da Aeronave</label>
-    <input type="text" id="prefixo" placeholder="Ex: PR-XYZ" required />
-
-    <label for="pn">PN</label>
-    <input type="text" id="pn" required />
-
-    <label for="serial">Serial</label>
-    <input type="text" id="serial" required />
-
-    <label for="quantidade">Quantidade</label>
-    <input type="number" id="quantidade" min="1" required />
-
-    <label for="descricao">Descrição</label>
-    <textarea id="descricao" rows="2"></textarea>
-
-    <label for="origem">Origem</label>
-    <select id="origem">
-      <option value="recebimento">Recebimento</option>
-      <option value="exportacao">Exportação</option>
-      <option value="TR">Transferência (TR)</option>
-    </select>
-
-    <label for="destino">Destino</label>
-    <select id="destino">
-      <option value="hangar">Hangar</option>
-      <option value="estoque">Estoque</option>
-      <option value="exportacao">Exportação</option>
-    </select>
-
-    <label for="foto">Foto do item</label>
-    <input type="file" id="foto" accept="image/*" />
-
-    <button type="submit">Salvar Item</button>
-    <button type="button" onclick="exportarJSON()">Exportar Dados</button>
+    <input type="text" id="awp" placeholder="AWB" required>
+    <input type="text" id="prefixo" placeholder="Prefixo da Aeronave" required>
+    <input type="text" id="pn" placeholder="PN" required>
+    <input type="text" id="serial" placeholder="Serial" required>
+    <input type="number" id="quantidade" placeholder="Quantidade" required>
+    <input type="text" id="descricao" placeholder="Descrição" required>
+    <input type="text" id="origem" placeholder="Origem" required>
+    <input type="text" id="destino" placeholder="Destino" required>
+    <input type="file" id="foto">
+    <button type="submit">Salvar</button>
   </form>
 
+  <h2>Itens Salvos</h2>
   <div id="itensSalvos"></div>
 
+  <!-- Firebase SDK -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    // IMPORTA FIREBASE
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBAju5P4yQCjsjdo3jZtPCJB1u877f7c6g",
-    authDomain: "jf-aviation-suprimentos.firebaseapp.com",
-    projectId: "jf-aviation-suprimentos",
-    storageBucket: "jf-aviation-suprimentos.firebasestorage.app",
-    messagingSenderId: "699408929091",
-    appId: "1:699408929091:web:0ca22ba1b607a449499ff6"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const form = document.getElementById('formItem');
-  const itensSalvos = document.getElementById('itensSalvos');
-  let dados = [];
-
-  function renderizarItens() {
-    itensSalvos.innerHTML = '';
-    dados.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'item-salvo';
-      div.innerHTML = `
-        <div class="acoes">
-          <button onclick="excluirItem(${index})">Excluir</button>
-        </div>
-        <strong>AWB:</strong> ${item.awb}<br>
-        <strong>Prefixo da Aeronave:</strong> ${item.prefixo}<br>
-        <strong>PN:</strong> ${item.pn}<br>
-        <strong>Serial:</strong> ${item.serial}<br>
-        <strong>Quantidade:</strong> ${item.quantidade}<br>
-        <strong>Descrição:</strong> ${item.descricao}<br>
-        <strong>Origem:</strong> ${item.origem}<br>
-        <strong>Destino:</strong> ${item.destino}<br>
-        <strong>Data/Hora:</strong> ${item.dataHora}<br>
-        ${item.imagem ? `<img src="${item.imagem}" style="max-width:200px; margin-top:10px;">` : '<em>Sem foto</em>'}
-      `;
-      itensSalvos.appendChild(div);
-    });
-  }
-
-  function excluirItem(index) {
-    if (confirm("Deseja excluir este item?")) {
-      dados.splice(index, 1);
-      renderizarItens();
-    }
-  }
-
-  window.excluirItem = excluirItem; // Torna a função visível no HTML
-
-  function exportarJSON() {
-    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'dados_itens.json';
-    a.click();
-  }
-
-  window.exportarJSON = exportarJSON; // Para o botão funcionar
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const dataHora = new Date().toLocaleString();
-
-    const awb = document.getElementById('awb').value;
-    const prefixo = document.getElementById('prefixo').value;
-    const pn = document.getElementById('pn').value;
-    const serial = document.getElementById('serial').value;
-    const quantidade = document.getElementById('quantidade').value;
-    const descricao = document.getElementById('descricao').value;
-    const origem = document.getElementById('origem').value;
-    const destino = document.getElementById('destino').value;
-    const foto = document.getElementById('foto').files[0];
-
-    const reader = new FileReader();
-    reader.onload = function () {
-      const imagemURL = foto ? reader.result : '';
-      const item = { awb, prefixo, pn, serial, quantidade, descricao, origem, destino, dataHora, imagem: imagemURL };
-
-      addDoc(collection(db, "suplementos"), item)
-        .then(() => {
-          alert("Item salvo com sucesso no Firebase!");
-          dados.push(item);
-          renderizarItens();
-          form.reset();
-        })
-        .catch((error) => {
-          console.error("Erro ao salvar:", error);
-        });
+    // CONFIGURAÇÕES DO FIREBASE
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_BUCKET",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
     };
 
-    if (foto) {
-      reader.readAsDataURL(foto);
-    } else {
-      reader.onload();
+    // INICIALIZA FIREBASE
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // FORMULÁRIO
+    const form = document.getElementById("formItem");
+    const itensDiv = document.getElementById("itensSalvos");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const item = {
+        awp: document.getElementById("awp").value,
+        prefixo: document.getElementById("prefixo").value,
+        pn: document.getElementById("pn").value,
+        serial: document.getElementById("serial").value,
+        quantidade: parseInt(document.getElementById("quantidade").value),
+        descricao: document.getElementById("descricao").value,
+        origem: document.getElementById("origem").value,
+        destino: document.getElementById("destino").value,
+        dataCadastro: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, "itens"), item);
+        alert("Item salvo com sucesso!");
+        form.reset();
+        carregarItens();
+      } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Erro ao salvar item.");
+      }
+    });
+
+    async function carregarItens() {
+      itensDiv.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "itens"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.classList.add("item");
+        div.innerHTML = `
+          <strong>AWB:</strong> ${data.awp} <br>
+          <strong>Prefixo:</strong> ${data.prefixo} <br>
+          <strong>PN:</strong> ${data.pn} <br>
+          <strong>Serial:</strong> ${data.serial} <br>
+          <strong>Quantidade:</strong> ${data.quantidade} <br>
+          <strong>Descrição:</strong> ${data.descricao} <br>
+          <strong>Origem:</strong> ${data.origem} <br>
+          <strong>Destino:</strong> ${data.destino} <br>
+          <small><em>${new Date(data.dataCadastro).toLocaleString()}</em></small>
+        `;
+        itensDiv.appendChild(div);
+      });
     }
-  });
-</script>
+
+    // CHAMA AO CARREGAR
+    carregarItens();
+  </script>
+
 </body>
 </html>
