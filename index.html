@@ -1,224 +1,213 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Materiais - JF Aviation</title>
   <style>
-    :root {
-      --primary-color: #b30000; /* vermelho JF Aviation */
-      --secondary-color: #f4f4f4;
-      --text-color: #222;
-      --border-radius: 10px;
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 20px;
-      background-color: var(--secondary-color);
-      color: var(--text-color);
+      padding: 0;
+      background: #f4f7fa;
+      color: #333;
     }
 
     header {
-      background-color: var(--primary-color);
+      background: #003366;
       color: white;
-      padding: 20px;
+      padding: 1rem;
       text-align: center;
-      border-radius: 0 0 10px 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
 
-    h2 {
-      color: var(--primary-color);
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     form {
-      background: #fff;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
     }
 
-    input, button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      padding: 8px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      border-radius: var(--border-radius);
-      box-sizing: border-box;
+      margin-top: 4px;
     }
 
     button {
-      background-color: var(--primary-color);
+      grid-column: span 2;
+      padding: 12px;
+      background: #003366;
       color: white;
-      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: 0.3s;
     }
 
     button:hover {
-      background-color: #800000;
+      background: #0055aa;
     }
 
-    #itensSalvos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+    table {
+      width: 100%;
+      margin-top: 2rem;
+      border-collapse: collapse;
     }
 
-    .item {
-      background: white;
-      padding: 15px;
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .item strong {
-      color: var(--primary-color);
-    }
-
-    .item img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    footer {
-      margin-top: 50px;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: center;
-      padding: 20px;
-      background-color: var(--primary-color);
+    }
+
+    th {
+      background: #003366;
       color: white;
-      font-size: 14px;
-      border-radius: 10px 10px 0 0;
+    }
+
+    img.preview {
+      width: 80px;
+      height: auto;
     }
 
     @media (max-width: 600px) {
-      form {
-        flex-direction: column;
-      }
-
-      input, button {
-        font-size: 14px;
+      button {
+        grid-column: span 1;
       }
     }
   </style>
 </head>
+
 <body>
+  <header>JF Aviation - Controle de Materiais</header>
+  <main>
+    <form id="materialForm">
+      <label>AWB
+        <input type="text" name="awb" required>
+      </label>
+      <label>PN (Part Number)
+        <input type="text" name="pn" required>
+      </label>
+      <label>Serial Number
+        <input type="text" name="serial" required>
+      </label>
+      <label>Descrição
+        <textarea name="descricao" rows="2"></textarea>
+      </label>
+      <label>Origem
+        <input type="text" name="origem">
+      </label>
+      <label>Destino
+        <input type="text" name="destino">
+      </label>
+      <label>Tipo de Documento
+        <select name="tipo">
+          <option value="Recebimento">Recebimento</option>
+          <option value="Exportação">Exportação</option>
+          <option value="Estoque">Estoque</option>
+          <option value="Recex">Recex</option>
+        </select>
+      </label>
+      <label>Situação
+        <input type="text" name="situacao" placeholder="Ex: Em análise, Aprovado, etc">
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="Pendente">Pendente</option>
+          <option value="Processado">Processado</option>
+          <option value="Finalizado">Finalizado</option>
+          <option value="Finalizado">Aguardando Info</option>
+        </select>
+      </label>
+      <label>Data de Recebimento
+        <input type="date" name="data">
+      </label>
+      <label>Foto
+        <input type="file" name="foto" accept="image/*">
+      </label>
+      <button type="submit">Cadastrar Material</button>
+    </form>
 
-  <header>
-    <h1>JF Aviation - Controle de Suprimentos</h1>
-  </header>
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>AWB</th>
+          <th>PN</th>
+          <th>Serial</th>
+          <th>Origem</th>
+          <th>Destino</th>
+          <th>Tipo</th>
+          <th>Status</th>
+          <th>Situação</th>
+          <th>Data</th>
+          <th>Foto</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
 
-  <h2>Cadastro de Itens</h2>
-  <form id="formItem">
-    <input type="text" id="awb" placeholder="AWB" required>
-    <input type="text" id="prefixo" placeholder="Prefixo da Aeronave" required>
-    <input type="text" id="pn" placeholder="PN" required>
-    <input type="text" id="serial" placeholder="Serial" required>
-    <input type="number" id="quantidade" placeholder="Quantidade" required>
-    <input type="text" id="descricao" placeholder="Descrição" required>
-    <input type="text" id="origem" placeholder="Origem" required>
-    <input type="text" id="destino" placeholder="Destino" required>
-    <input type="file" id="foto" accept="image/*">
-    <button type="submit">Salvar</button>
-  </form>
+  <script>
+    const form = document.getElementById('materialForm');
+    const tabela = document.querySelector('#tabela tbody');
 
-  <h2>Itens Salvos</h2>
-  <div id="itensSalvos"></div>
-
-  <footer>
-    &copy; 2025 JF Aviation - Todos os direitos reservados.
-  </footer>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_AUTH_DOMAIN",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_BUCKET",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-
-    const form = document.getElementById("formItem");
-    const itensDiv = document.getElementById("itensSalvos");
-
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const fotoInput = document.getElementById("foto");
-      const arquivo = fotoInput.files[0];
-      let fotoURL = "";
+      const dados = new FormData(form);
+      const linha = document.createElement('tr');
 
-      try {
-        if (arquivo) {
-          const storageRef = ref(storage, `fotos/${Date.now()}_${arquivo.name}`);
-          const snapshot = await uploadBytes(storageRef, arquivo);
-          fotoURL = await getDownloadURL(snapshot.ref);
-        }
+      linha.innerHTML = `
+        <td>${dados.get('awb')}</td>
+        <td>${dados.get('pn')}</td>
+        <td>${dados.get('serial')}</td>
+        <td>${dados.get('origem')}</td>
+        <td>${dados.get('destino')}</td>
+        <td>${dados.get('tipo')}</td>
+        <td>${dados.get('status')}</td>
+        <td>${dados.get('situacao')}</td>
+        <td>${dados.get('data')}</td>
+        <td><img class="preview"></td>
+      `;
 
-        const item = {
-          awb: document.getElementById("awb").value,
-          prefixo: document.getElementById("prefixo").value,
-          pn: document.getElementById("pn").value,
-          serial: document.getElementById("serial").value,
-          quantidade: parseInt(document.getElementById("quantidade").value),
-          descricao: document.getElementById("descricao").value,
-          origem: document.getElementById("origem").value,
-          destino: document.getElementById("destino").value,
-          foto: fotoURL,
-          dataCadastro: new Date().toISOString()
-        };
+      const file = dados.get('foto');
+      const img = linha.querySelector('img');
 
-        await addDoc(collection(db, "itens"), item);
-        alert("Item salvo com sucesso!");
-        form.reset();
-        carregarItens();
-      } catch (error) {
-        console.error("Erro ao salvar:", error);
-        alert("Erro ao salvar item: " + error.message);
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => img.src = reader.result;
+        reader.readAsDataURL(file);
+      } else {
+        img.alt = 'Sem imagem';
       }
+
+      tabela.appendChild(linha);
+      form.reset();
     });
-
-    async function carregarItens() {
-      itensDiv.innerHTML = "";
-      const querySnapshot = await getDocs(collection(db, "itens"));
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.classList.add("item");
-        div.innerHTML = `
-          <strong>AWB:</strong> ${data.awb}<br>
-          <strong>Prefixo:</strong> ${data.prefixo}<br>
-          <strong>PN:</strong> ${data.pn}<br>
-          <strong>Serial:</strong> ${data.serial}<br>
-          <strong>Quantidade:</strong> ${data.quantidade}<br>
-          <strong>Descrição:</strong> ${data.descricao}<br>
-          <strong>Origem:</strong> ${data.origem}<br>
-          <strong>Destino:</strong> ${data.destino}<br>
-          <small><em>${new Date(data.dataCadastro).toLocaleString()}</em></small><br>
-          ${data.foto ? `<img src="${data.foto}" alt="Foto do item">` : ""}
-        `;
-        itensDiv.appendChild(div);
-      });
-    }
-
-    carregarItens();
   </script>
 </body>
+
 </html>
