@@ -5,36 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Controle de Materiais - JF Aviation</title>
   <style>
+    :root {
+      --primary-color: #004AAD;
+      --secondary-color: #F9F9F9;
+      --text-color: #333;
+      --border-radius: 10px;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       padding: 20px;
-      background-color: #f2f2f2;
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+    }
+
+    h2 {
+      color: var(--primary-color);
     }
 
     form {
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
+      background: #fff;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
     input, button {
-      display: block;
       width: 100%;
-      margin-top: 10px;
-      padding: 8px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #003a8c;
     }
 
     #itensSalvos {
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .item {
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
+      background: white;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .item strong {
+      color: var(--primary-color);
+    }
+
+    @media (max-width: 600px) {
+      form {
+        flex-direction: column;
+      }
+
+      input, button {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -42,7 +88,7 @@
 
   <h2>Cadastro de Itens</h2>
   <form id="formItem">
-    <input type="text" id="awp" placeholder="AWB" required>
+    <input type="text" id="awb" placeholder="AWB" required>
     <input type="text" id="prefixo" placeholder="Prefixo da Aeronave" required>
     <input type="text" id="pn" placeholder="PN" required>
     <input type="text" id="serial" placeholder="Serial" required>
@@ -59,11 +105,9 @@
 
   <!-- Firebase SDK -->
   <script type="module">
-    // IMPORTA FIREBASE
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // CONFIGURAÇÕES DO FIREBASE
     const firebaseConfig = {
       apiKey: "SUA_API_KEY",
       authDomain: "SEU_AUTH_DOMAIN",
@@ -73,11 +117,9 @@
       appId: "SEU_APP_ID"
     };
 
-    // INICIALIZA FIREBASE
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // FORMULÁRIO
     const form = document.getElementById("formItem");
     const itensDiv = document.getElementById("itensSalvos");
 
@@ -85,7 +127,7 @@
       e.preventDefault();
 
       const item = {
-        awp: document.getElementById("awp").value,
+        awb: document.getElementById("awb").value,
         prefixo: document.getElementById("prefixo").value,
         pn: document.getElementById("pn").value,
         serial: document.getElementById("serial").value,
@@ -115,21 +157,20 @@
         const div = document.createElement("div");
         div.classList.add("item");
         div.innerHTML = `
-          <strong>AWB:</strong> ${data.awp} <br>
-          <strong>Prefixo:</strong> ${data.prefixo} <br>
-          <strong>PN:</strong> ${data.pn} <br>
-          <strong>Serial:</strong> ${data.serial} <br>
-          <strong>Quantidade:</strong> ${data.quantidade} <br>
-          <strong>Descrição:</strong> ${data.descricao} <br>
-          <strong>Origem:</strong> ${data.origem} <br>
-          <strong>Destino:</strong> ${data.destino} <br>
+          <strong>AWB:</strong> ${data.awb}<br>
+          <strong>Prefixo:</strong> ${data.prefixo}<br>
+          <strong>PN:</strong> ${data.pn}<br>
+          <strong>Serial:</strong> ${data.serial}<br>
+          <strong>Quantidade:</strong> ${data.quantidade}<br>
+          <strong>Descrição:</strong> ${data.descricao}<br>
+          <strong>Origem:</strong> ${data.origem}<br>
+          <strong>Destino:</strong> ${data.destino}<br>
           <small><em>${new Date(data.dataCadastro).toLocaleString()}</em></small>
         `;
         itensDiv.appendChild(div);
       });
     }
 
-    // CHAMA AO CARREGAR
     carregarItens();
   </script>
 
