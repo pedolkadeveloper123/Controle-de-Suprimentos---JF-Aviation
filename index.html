@@ -73,9 +73,7 @@
     }
   </style>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  
 </head>
 <body>
   <h1>Controle de Suprimentos - JF Aviation</h1>
@@ -121,104 +119,108 @@
 
   <div id="itensSalvos"></div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBAju5P4yQCjsjdo3jZtPCJB1u877f7c6g",
-      authDomain: "jf-aviation-suprimentos.firebaseapp.com",
-      projectId: "jf-aviation-suprimentos",
-      storageBucket: "jf-aviation-suprimentos.firebasestorage.app",
-      messagingSenderId: "699408929091",
-      appId: "1:699408929091:web:0ca22ba1b607a449499ff6"
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAju5P4yQCjsjdo3jZtPCJB1u877f7c6g",
+    authDomain: "jf-aviation-suprimentos.firebaseapp.com",
+    projectId: "jf-aviation-suprimentos",
+    storageBucket: "jf-aviation-suprimentos.firebasestorage.app",
+    messagingSenderId: "699408929091",
+    appId: "1:699408929091:web:0ca22ba1b607a449499ff6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('formItem');
+  const itensSalvos = document.getElementById('itensSalvos');
+  let dados = [];
+
+  function renderizarItens() {
+    itensSalvos.innerHTML = '';
+    dados.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'item-salvo';
+      div.innerHTML = `
+        <div class="acoes">
+          <button onclick="excluirItem(${index})">Excluir</button>
+        </div>
+        <strong>AWB:</strong> ${item.awb}<br>
+        <strong>Prefixo da Aeronave:</strong> ${item.prefixo}<br>
+        <strong>PN:</strong> ${item.pn}<br>
+        <strong>Serial:</strong> ${item.serial}<br>
+        <strong>Quantidade:</strong> ${item.quantidade}<br>
+        <strong>Descrição:</strong> ${item.descricao}<br>
+        <strong>Origem:</strong> ${item.origem}<br>
+        <strong>Destino:</strong> ${item.destino}<br>
+        <strong>Data/Hora:</strong> ${item.dataHora}<br>
+        ${item.imagem ? `<img src="${item.imagem}" style="max-width:200px; margin-top:10px;">` : '<em>Sem foto</em>'}
+      `;
+      itensSalvos.appendChild(div);
+    });
+  }
+
+  function excluirItem(index) {
+    if (confirm("Deseja excluir este item?")) {
+      dados.splice(index, 1);
+      renderizarItens();
+    }
+  }
+
+  window.excluirItem = excluirItem; // Torna a função visível no HTML
+
+  function exportarJSON() {
+    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dados_itens.json';
+    a.click();
+  }
+
+  window.exportarJSON = exportarJSON; // Para o botão funcionar
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const dataHora = new Date().toLocaleString();
+
+    const awb = document.getElementById('awb').value;
+    const prefixo = document.getElementById('prefixo').value;
+    const pn = document.getElementById('pn').value;
+    const serial = document.getElementById('serial').value;
+    const quantidade = document.getElementById('quantidade').value;
+    const descricao = document.getElementById('descricao').value;
+    const origem = document.getElementById('origem').value;
+    const destino = document.getElementById('destino').value;
+    const foto = document.getElementById('foto').files[0];
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      const imagemURL = foto ? reader.result : '';
+      const item = { awb, prefixo, pn, serial, quantidade, descricao, origem, destino, dataHora, imagem: imagemURL };
+
+      addDoc(collection(db, "suplementos"), item)
+        .then(() => {
+          alert("Item salvo com sucesso no Firebase!");
+          dados.push(item);
+          renderizarItens();
+          form.reset();
+        })
+        .catch((error) => {
+          console.error("Erro ao salvar:", error);
+        });
     };
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-    const form = document.getElementById('formItem');
-    const itensSalvos = document.getElementById('itensSalvos');
-    let dados = [];
-
-    function renderizarItens() {
-      itensSalvos.innerHTML = '';
-      dados.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'item-salvo';
-        div.innerHTML = `
-          <div class="acoes">
-            <button onclick="excluirItem(${index})">Excluir</button>
-          </div>
-          <strong>AWB:</strong> ${item.awp}<br>
-          <strong>Prefixo da Aeronave:</strong> ${item.prefixo}<br>
-          <strong>PN:</strong> ${item.pn}<br>
-          <strong>Serial:</strong> ${item.serial}<br>
-          <strong>Quantidade:</strong> ${item.quantidade}<br>
-          <strong>Descrição:</strong> ${item.descricao}<br>
-          <strong>Origem:</strong> ${item.origem}<br>
-          <strong>Destino:</strong> ${item.destino}<br>
-          <strong>Data/Hora:</strong> ${item.dataHora}<br>
-          ${item.imagem ? `<img src="${item.imagem}" style="max-width:200px; margin-top:10px;">` : '<em>Sem foto</em>'}
-        `;
-        itensSalvos.appendChild(div);
-      });
+    if (foto) {
+      reader.readAsDataURL(foto);
+    } else {
+      reader.onload();
     }
-
-    function excluirItem(index) {
-      if (confirm("Deseja excluir este item?")) {
-        dados.splice(index, 1);
-        renderizarItens();
-      }
-    }
-
-    function exportarJSON() {
-      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'dados_itens.json';
-      a.click();
-    }
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const dataHora = new Date().toLocaleString();
-
-      const awp = document.getElementById('awb').value;
-      const prefixo = document.getElementById('prefixo').value;
-      const pn = document.getElementById('pn').value;
-      const serial = document.getElementById('serial').value;
-      const quantidade = document.getElementById('quantidade').value;
-      const descricao = document.getElementById('descricao').value;
-      const origem = document.getElementById('origem').value;
-      const destino = document.getElementById('destino').value;
-      const foto = document.getElementById('foto').files[0];
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const imagemURL = foto ? reader.result : '';
-        const item = { awb, prefixo, pn, serial, quantidade, descricao, origem, destino, dataHora, imagem: imagemURL };
-
-        addDoc(collection(db, "suplementos"), item)
-  .then(() => {
-    alert("Item salvo com sucesso no Firebase!");
-    dados.push(item);
-    renderizarItens();
-    form.reset();
-  })
-  .catch((error) => {
-    console.error("Erro ao salvar:", error);
-          });
-      };
-
-      if (foto) {
-        reader.readAsDataURL(foto);
-      } else {
-        reader.onload();
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
