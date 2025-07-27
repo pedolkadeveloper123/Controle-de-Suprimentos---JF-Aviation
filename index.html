@@ -131,8 +131,11 @@
       appId: "1:699408929091:web:0ca22ba1b607a449499ff6"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
     const form = document.getElementById('formItem');
     const itensSalvos = document.getElementById('itensSalvos');
@@ -198,15 +201,15 @@
         const imagemURL = foto ? reader.result : '';
         const item = { awb, prefixo, pn, serial, quantidade, descricao, origem, destino, dataHora, imagem: imagemURL };
 
-        db.collection("suplementos").add(item)
-          .then(() => {
-            alert("Item salvo com sucesso no Firebase!");
-            dados.push(item);
-            renderizarItens();
-            form.reset();
-          })
-          .catch((error) => {
-            console.error("Erro ao salvar:", error);
+        addDoc(collection(db, "suplementos"), item)
+  .then(() => {
+    alert("Item salvo com sucesso no Firebase!");
+    dados.push(item);
+    renderizarItens();
+    form.reset();
+  })
+  .catch((error) => {
+    console.error("Erro ao salvar:", error);
           });
       };
 
